@@ -1,0 +1,85 @@
+pragma solidity ^0.4.18;
+
+    
+contract Drawing {
+    
+
+    struct Picture {
+    string name;
+    string size;
+    string price;
+    string year;
+    uint token_id;
+    address owner;
+    }
+    
+    //Назначение начального количества рисунков
+    uint32 public total_pictures = 0;
+    
+    // Назначение первого владельца
+    mapping(uint => address) public ownerOf;
+    mapping(uint => Picture) public pictures;
+    mapping(address => uint256[]) tokensOfOwner;
+    
+    function createDrawing(string _name, string _size, string _price, string _year) public {
+        total_pictures++;
+        uint32 id = total_pictures;
+        //Назначение первого владельца
+        address picture_owner = msg.sender;
+        ownerOf[id] = picture_owner;
+        pictures[id] = Picture({token_id: id, owner: picture_owner, name: _name, size: _size, price: _price, year: _year});
+        //Определение владельца
+        tokensOfOwner[picture_owner].push(id);
+    }
+    
+   function demolishPicture(uint32 _token_id) public {
+        require(ownerOf[_token_id] == msg.sender);
+        pictures[_token_id] = Picture({token_id: _token_id, owner: address(0),
+                               name: '', size: '', year: '', price: ''});
+        ownerOf[_token_id] = address(0);
+    }
+    // Задание модификатора (для определения текущего владельца рисунка)
+        modifier onlyOwner() {
+       address owner = msg.sender;
+       require(msg.sender == owner);
+    _;
+    }
+
+    // Передача прав, проверка владельца
+    function transfer(address newOwner) public {
+        address owner = msg.sender;
+	    owner = newOwner;
+    }
+    
+    function changeName(uint32 _token_id, string _name) public {
+       require(ownerOf[_token_id] == msg.sender);
+       pictures[_token_id].name = _name;
+    }
+
+    function getName(uint32 _token_id) public constant returns(string) {
+       return pictures[_token_id].name;
+       
+    }
+    
+    function changePrice(uint32 _token_id, string _price) public {
+       require(ownerOf[_token_id] == msg.sender);
+       pictures[_token_id].price = _price;
+    }
+
+    function getPrice(uint32 _token_id) public constant returns(string) {
+       return pictures[_token_id].price;
+       
+    }
+   
+    function getSize(uint32 _token_id) public constant returns(string) {
+       return pictures[_token_id].size;
+      
+    }
+    
+    function getYear(uint32 _token_id) public constant returns(string) {
+       return pictures[_token_id].year;
+       
+    }
+    
+   
+}
