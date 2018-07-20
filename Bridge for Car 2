@@ -1,7 +1,53 @@
 pragma solidity ^0.4.24;
 
-import "./Ownable.sol";
-import "./ERC721Interface.sol";
+interface ERC721Interface {
+    function safeTransferFrom(address _from, address _to, string _tokenVIN, bytes _data) public;
+    function getSerializedData (string _tokenId) public view returns (bytes);
+    // demolishToken (string token_id) external;
+    function transferFrom(address _from, address _to, string _tokenVIN) public;
+    function recoveryToken (address owner, string token_id, bytes data) external;
+}
+
+
+contract Ownable {
+  address public owner;
+
+
+  event OwnershipRenounced(address indexed previousOwner);
+  event OwnershipTransferred(
+    address indexed previousOwner,
+    address indexed newOwner
+  );
+
+
+  
+  constructor() public {
+    owner = msg.sender;
+  }
+
+  modifier onlyOwner() {
+    require(msg.sender == owner);
+    _;
+  }
+
+  
+  function renounceOwnership() public onlyOwner {
+    emit OwnershipRenounced(owner);
+    owner = address(0);
+  }
+
+ 
+  function transferOwnership(address _newOwner) public onlyOwner {
+    _transferOwnership(_newOwner);
+  }
+
+ 
+  function _transferOwnership(address _newOwner) internal {
+    require(_newOwner != address(0));
+    emit OwnershipTransferred(owner, _newOwner);
+    owner = _newOwner;
+  }
+}
 
 contract Bridge is Ownable {
     
